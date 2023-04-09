@@ -4,11 +4,6 @@
 #include "UIMain.h"
 #include "DOWorldLOD.h"
 
-bool Game_IsCareerMode()
-{
-	return 1;
-}
-
 void Init()
 {
 	// Remember, no Russian
@@ -79,16 +74,12 @@ void Init()
 	injector::MakeJMP(0x6E47DD, ShadowFOVCodeCave3, true); // sub_6E44C0
 	injector::MakeJMP(0x6E4825, ShadowFOVCodeCave4, true); // sub_6E44C0
 	
-	// fix TOD & possibly ChanceOfRain not working
-	injector::MakeNOP(0x600AEA, 0x5, true);
-	injector::MakeJMP(0x605610, Game_IsCareerMode, true);
 
-	// HUD is probably not working because it does not fetch car preset name from vlt when loading HUD
-	// Insted it tries to find the car in FE and presumably fails
 
 	// TODO
 	// - Fix custom speedos getting ignored in Challenge Series
 	// - Force game to actually follow event's ForceHeatLevel & MaxHeatLevel parameters (currently only does ForceHeatLevel) (issue only applies to non-pursuit events like circuit, sprint, etc)
+	// - Force game to actually follow event's ChanceOfRain & TOD parameters
 	//
 	// not sure about last two, but if possible...
 	// - There will be a camera shake option (through .ini config). It's done through editing vlt attributes (if ON = see script "camera_enablenoise.nfsms"; if OFF = do nothing)
