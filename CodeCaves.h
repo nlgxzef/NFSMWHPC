@@ -105,3 +105,75 @@ void __declspec(naked) ShadowFOVCodeCave4()
 		retn
 	}
 }
+
+DWORD* DefaultsButton;
+
+void __declspec(naked) HideDefaultsCodeCave_AGP()
+{
+	_asm pushad;
+
+	// PC
+	DefaultsButton = FEngFindObject("Options.fng", 0xD6463100); // PC Defaults button group
+	if (DefaultsButton) FEngSetInvisible(DefaultsButton);
+
+	// Console
+	DefaultsButton = FEngFindObject("Options.fng", 0x28B8FD2F); // Console Defaults text
+	if (DefaultsButton) FEngSetInvisible(DefaultsButton);
+	DefaultsButton = FEngFindObject("Options.fng", 0xD9A22505); // Console Circle button
+	if (DefaultsButton) FEngSetInvisible(DefaultsButton);
+
+	_asm
+	{
+		popad
+		retn
+	}
+}
+
+void __declspec(naked) HideDefaultsCodeCave_Video()
+{
+	_asm
+	{
+		mov fs:00000000, ecx
+		add esp, 0x14
+		pushad
+	}
+
+	// PC
+	DefaultsButton = FEngFindObject("OptionsPCDisplay.fng", 0xD6463100); // PC Defaults button group
+	if (DefaultsButton) FEngSetInvisible(DefaultsButton);
+
+	// No console, PC-Only FNG
+
+	_asm
+	{
+		popad
+		retn
+	}
+}
+
+float BtnX, BtnY;
+DWORD* ClearButton;
+
+void __declspec(naked) HideDefaultsCodeCave_Controller()
+{
+	_asm pushad;
+
+	// PC
+	DefaultsButton = FEngFindObject("Options_PC_Controller.fng", 0xD6463100); // PC Defaults button group
+	if (DefaultsButton)
+	{
+		FEngGetCenter(DefaultsButton, &BtnX, &BtnY);
+		FEngSetInvisible(DefaultsButton);
+	}
+
+	ClearButton = FEngFindObject("Options_PC_Controller.fng", 0xA34A74D2); // PC Clear button group
+	if (DefaultsButton) FEngSetCenter(ClearButton, BtnX, BtnY); // move it in place of defaults
+
+	// No console, PC-Only FNG
+
+	_asm
+	{
+		popad
+		retn
+	}
+}

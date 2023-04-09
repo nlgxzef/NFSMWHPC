@@ -2,24 +2,17 @@
 #include "CodeCaves.h"
 #include "Helpers.h"
 #include "UIMain.h"
+#include "UIQRCarSelect.h"
 #include "DOWorldLOD.h"
+#include "Game.h"
 
 void Init()
 {
 	// Remember, no Russian
-	if (DoesFileExist("..\\Languages\\Russian.bin"))
+	if (DoesFileExist("Languages\\Russian.bin") || DoesFileExist("..\\Languages\\Russian.bin"))
 	{
 		MessageBoxA(NULL, "ERROR: It seems that your game appears to be a russian release or/and contains related files to it. Please install an US English v1.3 version.", "NFSMW Hot Pursuit Challenges", MB_ICONERROR);
 		*(int*)_ExitTheGameFlag = 1;
-	}
-
-	// Reshade check
-	bool ReShadeDLLExists = DoesFileExist("..\\d3d9.dll") || DoesFileExist("..\\scripts\\reshade.asi");
-	bool ReShadeFXHExists = DoesFileExist("reshade-shaders\\Shaders\\ReShade.fxh") || DoesFileExist("..\\reshade-shaders\\Shaders\\ReShade.fxh");
-	if (ReShadeDLLExists && ReShadeFXHExists)
-	{
-		// Todo: ReShade related stuff
-		//MessageBoxA(NULL, "we have reshade.", "NFSMW Hot Pursuit Challenges", MB_ICONERROR);
 	}
 
 	// Replace main menu to show HPC specific options
@@ -44,17 +37,6 @@ void Init()
 	// Disable Interactive Music by default
 	injector::WriteMemory<int>(0x56D61F, 0, true); // AudioSettings::Default
 
-	// Make game read "MINI_MAP_U2.BIN" file instead of "MINI_MAP_Unlock_2.BIN"
-	/*injector::WriteMemory(0x8A0DF6, '2', true);
-	injector::WriteMemory(0x8A0DF7, '\0', true);
-	injector::WriteMemory(0x8A0DF8, 0, true);
-	injector::WriteMemory(0x8A0DFC, 0, true);*/
-
-	//Make game read "HPC_DIABLO_YELLOW" string in executable instead of "M3GTRCAREERSTART" and "E3_DEMO_BMW"
-	char* HPCDiabloYellow = "HPC_DIABLO_YELLOW";
-	injector::WriteMemory(0x551D76, HPCDiabloYellow, true); // uiRepSheetRivalBio::NotificationMessage
-	injector::WriteMemory(0x58FF63, HPCDiabloYellow, true); // sub_58FF60
-
 	// Can Spawn Roadblocks in Quick Race - AIPursuit::RequestRoadBlock
 	injector::MakeNOP(0x419519, 6, true);
 
@@ -73,15 +55,32 @@ void Init()
 	injector::MakeJMP(0x6E46A5, ShadowFOVCodeCave2, true); // sub_6E44C0
 	injector::MakeJMP(0x6E47DD, ShadowFOVCodeCave3, true); // sub_6E44C0
 	injector::MakeJMP(0x6E4825, ShadowFOVCodeCave4, true); // sub_6E44C0
+
+	// fix TOD & possibly ChanceOfRain not working
+	injector::MakeNOP(0x600AEA, 0x5, true);
+	injector::MakeJMP(0x605610, Game_IsCareerMode, true);
 	
+	// Skip "Career" mode while switching between car categories
+	injector::MakeJMP(0x7BF970, UIQRCarSelect_ScrollLists, true); // 4 references, may need hooking by calls in another script
 
+	// Disable "Defaults" option
+	//injector::MakeJMP(0x545BF0, 0x545C2E, true); // UIOptionsScreen::NotificationMessage (disable defaulting function)
+	//injector::MakeRangedNOP(0x545C27, 0x545C2E, true);
+	injector::MakeNOP(0x545A32, 6, true);  // UIOptionsScreen::NotificationMessage (disable dialog)
+	//injector::MakeJMP(0x545A32, 0x545C2E, true);
+	// jz 0x545C2E
+	injector::WriteMemory<WORD>(0x545A32, 0x840F, true);
+	injector::WriteMemory<DWORD>(0x545A34, 0x01F6, true);
+	injector::WriteMemory<WORD>(0x54611C, 0x3774, true); // UIOptionsPCController::NotificationMessage (jz 0x546155)
 
-	// TODO
-	// - Fix custom speedos getting ignored in Challenge Series
-	// - Force game to actually follow event's ForceHeatLevel & MaxHeatLevel parameters (currently only does ForceHeatLevel) (issue only applies to non-pursuit events like circuit, sprint, etc)
-	// - Force game to actually follow event's ChanceOfRain & TOD parameters
-	//
-	// not sure about last two, but if possible...
-	// - There will be a camera shake option (through .ini config). It's done through editing vlt attributes (if ON = see script "camera_enablenoise.nfsms"; if OFF = do nothing)
-	// - There will be a smoke graphic setting (through .ini config). It's done through editing vlt attributes (if HIGH = see script "tire_smoke_high.nfsms"; if MEDIUM = "tire_smoke_medium.nfsms"; if LOW = do nothing)
+	// Hide "Defaults" option
+	injector::MakeJMP(0x5295E8, HideDefaultsCodeCave_AGP, true); // UIOptionsScreen::SetupAudio
+	injector::MakeJMP(0x529C03, HideDefaultsCodeCave_Video, true); // UIOptionsScreen::SetupVideo
+	injector::MakeJMP(0x529F04, HideDefaultsCodeCave_AGP, true); // UIOptionsScreen::SetupGameplay
+	injector::MakeJMP(0x52A284, HideDefaultsCodeCave_AGP, true); // UIOptionsScreen::SetupPlayer
+	injector::MakeJMP(0x52AB89, HideDefaultsCodeCave_Controller, true); // UIOptionsPCController::Setup
+
+	// Hide Quick Play mode from Quick Race Menu
+	injector::MakeNOP(0x7AA753, 2, true); // UIQRMainMenu::Setup
+
 }

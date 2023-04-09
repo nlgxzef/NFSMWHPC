@@ -2,47 +2,7 @@
 
 #include "stdio.h"
 #include <windows.h>
-
-#define LOBYTE(x)   (*((BYTE*)&(x)))   // low byte
-#define LOWORD(x)   (*((WORD*)&(x)))   // low word
-#define LODWORD(x)  (*((DWORD*)&(x)))  // low dword
-#define HIBYTE(x)   (*((BYTE*)&(x)+1))
-#define HIWORD(x)   (*((WORD*)&(x)+1))
-#define HIDWORD(x)  (*((DWORD*)&(x)+1))
-#define BYTEn(x, n)   (*((BYTE*)&(x)+n))
-#define WORDn(x, n)   (*((WORD*)&(x)+n))
-
-#define CarTypeInfoArray 0x9B09D8
-#define SingleCarTypeInfoBlockSize 0xD0
-
-#define _ExitTheGameFlag 0x9257EC
-#define _gCarCustomizeManager 0x9B9EC0
-#define _FECarRecord 0x9B9EC4
-#define _FEDatabase 0x91CF90
-#define _CarPartDB 0x9B26A8
-#define _MasterCarPartPack 0x9B09D4
-#define _CarPartTypeNameHashTable 0x9B09C4
-#define _CarPartModelsTable 0x9B09D0
-#define g_pCustomizeMainPkg 0x905EA4
-#define g_pCustomizePartsPkg 0x905EB0
-#define g_pCustomizePerfPkg 0x905EB4
-#define g_pCustomizeDecalsPkg 0x905EB8
-#define g_pCustomizeSubPkg 0x905EA8
-#define g_pCustomizeSubTopPkg 0x905EAC
-#define g_pCustomizeSpoilerPkg 0x905ECC
-#define g_pCustomizeRimsPkg 0x905EC0
-#define g_pCustomizeHudColorPkg 0x905EC8
-#define g_pCustomizePaintPkg 0x905EBC
-#define g_pCustomizeHudPkg 0x905EC4
-#define g_pCustomizeShoppingCartPkg 0x905ED0
-#define SelectablePart_vtable 0x8B7518
-#define SetStockPartOption_vtable 0x8B7564
-
-#define GRaceStatus_fObj 0x91E000
-#define gEasterEggs 0x8F8408
-#define g_bTestCareerCustomization 0x9B9E8D
-#define g_bCustomizeInBackRoom 0x91D3D0
-#define _FEGroup_vtbl 0x8A2E24
+#include "GlobalVariables.h"
 
 unsigned int(__thiscall* IconOption_Create)(void* MenuItemPtr, DWORD IconTextureHash, DWORD NameStringHash, DWORD unknown) = (unsigned int(__thiscall*)(void*, DWORD, DWORD, DWORD))0x586FA0;
 unsigned int(__thiscall* IconScrollerMenu_AddOption)(void* TheThis, DWORD* IconOption) = (unsigned int(__thiscall*)(void*, DWORD*))0x573960;
@@ -104,6 +64,7 @@ void(__thiscall* FEMinList_AddNode)(DWORD* FEMinList, DWORD* FEMinNode, DWORD* F
 int(__cdecl* FEPrintf)(const char* pkg_name, unsigned int obj_hash, const char* format, ...) = (int(__cdecl*)(const char*, unsigned int, const char*, ...))0x5252D0;
 DWORD* (__cdecl* FEngFindObject)(const char* pkg_name, unsigned int obj_hash) = (DWORD * (__cdecl*)(const char*, unsigned int))0x524850;
 DWORD* (__cdecl* FEngSetInvisible)(DWORD* obj) = (DWORD * (__cdecl*)(DWORD*))0x514C70;
+DWORD* (__cdecl* FEngGetCenter)(DWORD* obj, float* x, float* y) = (DWORD * (__cdecl*)(DWORD*, float*, float*))0x524EE0;
 DWORD* (__cdecl* FEngSetCenter)(DWORD* obj, float x, float y) = (DWORD * (__cdecl*)(DWORD*, float, float))0x525050;
 void(__thiscall* CustomizationScreen_RefreshHeader)(DWORD* CustomizationScreen) = (void(__thiscall*)(DWORD*))0x7B1620;
 int(__thiscall* bList_TraversebList)(DWORD* bList, DWORD* bNode) = (int(__thiscall*)(DWORD*, DWORD*))0x45D3A0;
@@ -112,3 +73,6 @@ char* (__thiscall* CarPart_GetName)(DWORD* CarPart) = (char* (__thiscall*)(DWORD
 void(__cdecl* FEngSetLanguageHash)(const char* pkg_name, unsigned int obj_hash, unsigned int LanguageHash) = (void(__cdecl*)(const char*, unsigned int, unsigned int))0x525220;
 void(__thiscall* FEPackage_BuildMouseObjectStateList)(DWORD*) = (void(__thiscall*)(DWORD*))0x5B88F0;
 void(__thiscall* FEPackage_ConnectObjectResources)(DWORD*) = (void(__thiscall*)(DWORD*))0x5B87E0;
+int(*GetMikeMannBuild)() = (int(*)())0x56E2B0;
+void(__thiscall* UIQRCarSelect_RefreshCarList)(DWORD*) = (void(__thiscall*)(DWORD*))0x7BF7B0;
+void(__thiscall* UIQRCarSelect_RefreshHeader)(DWORD*) = (void(__thiscall*)(DWORD*))0x7ADA50;

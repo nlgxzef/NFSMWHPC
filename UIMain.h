@@ -1,6 +1,8 @@
 #pragma once
 
 #define _Challenge_vtbl 0x89C1F4
+#define _MainQuickRace_vtbl 0x89C1FC
+#define _MainCustomize_vtbl 0x89C214
 #define _MainProfileManager_vtbl 0x89C21C
 #define _MainOptions_vtbl 0x89C224
 
@@ -18,6 +20,32 @@ void __fastcall UIMain_Setup(DWORD* UIMain, void* EDX_Unused)
 		IconOption_Create(AMenuOption, 0x9A962438, 0xCC8CB746, 0);
 		*AMenuOption = _Challenge_vtbl;
 		*((BYTE*)AMenuOption + 69) = 1;
+	}
+	else
+	{
+		AMenuOption = 0;
+	}
+	IconScrollerMenu_AddOption(UIMain, AMenuOption);
+
+	// Quick Race
+	AMenuOption = (DWORD*)j_malloc(0x4C);
+	if (AMenuOption)
+	{
+		IconOption_Create(AMenuOption, 0x4E6FBB02, 0x54020A7A, 0);
+		*AMenuOption = _MainQuickRace_vtbl;
+	}
+	else
+	{
+		AMenuOption = 0;
+	}
+	IconScrollerMenu_AddOption(UIMain, AMenuOption);
+
+	// My Cars
+	AMenuOption = (DWORD*)j_malloc(0x4C);
+	if (AMenuOption)
+	{
+		IconOption_Create(AMenuOption, 0xB0C46023, 0x1AFD5BE6, 0);
+		*AMenuOption = _MainCustomize_vtbl;
 	}
 	else
 	{
