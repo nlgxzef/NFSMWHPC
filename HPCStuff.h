@@ -82,5 +82,18 @@ void Init()
 
 	// Hide Quick Play mode from Quick Race Menu
 	injector::MakeNOP(0x7AA753, 2, true); // UIQRMainMenu::Setup
-
+	
+	// ULv4 Car Skin Fix (Requires CarSkinCount (20) x dummy skin and wheel textures in CARS\TEXTURES.BIN)
+	// VehicleRenderConn::Load
+	injector::MakeNOP(0x75D29E, 2, true); // Skip precomposite skins
+	injector::MakeRangedNOP(0x75D2BB, 0x75D2D6, true);
+	injector::WriteMemory<unsigned char>(0x75D2B6, 20, true); // 4 -> 20
+	// RideInfo::SetCompositeNameHash
+	injector::MakeRangedNOP(0x747F2B, 0x747F3B, true); // Skip precomposite skins
+	injector::MakeJMP(0x747F2B, 0x747F3B, true);
+	injector::WriteMemory<unsigned char>(0x747F22, 20, true); // 4 -> 20
+	
+	// Always add both ride height values, not just when it's close enough (from chassis and ecar) (ty rx)
+	injector::MakeRangedNOP(0x7470AC, 0x7470B2, true); // CarRenderConn::UpdateRenderMatrix
+	
 }
