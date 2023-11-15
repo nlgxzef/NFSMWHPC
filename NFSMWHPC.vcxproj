@@ -95,7 +95,6 @@ copy "$(TargetDir)*.pdb" "G:\Oyunlar\Need for Speed Most Wanted HPC\scripts"  /y
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="CodeCaves.h" />
-    <ClInclude Include="DOWorldLOD.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="GlobalVariables.h" />
     <ClInclude Include="Helpers.h" />

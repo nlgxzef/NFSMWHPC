@@ -3,7 +3,6 @@
 #include "Helpers.h"
 #include "UIMain.h"
 #include "UIQRCarSelect.h"
-#include "DOWorldLOD.h"
 #include "Game.h"
 
 void Init()
@@ -14,6 +13,9 @@ void Init()
 		MessageBoxA(NULL, "ERROR: It seems that your game appears to be a russian release or/and contains related files to it. Please install an US English v1.3 version.", "NFSMW Hot Pursuit Challenges", MB_ICONERROR);
 		*(int*)_ExitTheGameFlag = 1;
 	}
+
+	bool UnlimiterCompatibility = GetModuleHandleA("NFSMWUnlimiter.asi") ? 1 : 0;
+	bool LimitAdjusterCompatibility = GetModuleHandleA("NFSMWLimitAdjuster.asi") ? 1 : 0;
 
 	// Replace main menu to show HPC specific options
 	injector::MakeCALL(0x54FD11, UIMain_Setup, true); // UIMain::UIMain
@@ -30,9 +32,6 @@ void Init()
 
 	// Remove Over Bright and Visual Treatment options - UIOptionsScreen::SetupVideo
 	injector::MakeJMP(0x529B29, 0x529BC7, true);
-
-	// Restrict World LOD Option to 2-3
-	injector::WriteMemory(0x89BC3C, &DOWorldLOD_Act, true); // DOWorldLOD::vtable
 
 	// Disable Interactive Music by default
 	injector::WriteMemory<int>(0x56D61F, 0, true); // AudioSettings::Default
@@ -83,15 +82,18 @@ void Init()
 	// Hide Quick Play mode from Quick Race Menu
 	injector::MakeNOP(0x7AA753, 2, true); // UIQRMainMenu::Setup
 	
-	// ULv4 Car Skin Fix (Requires CarSkinCount (20) x dummy skin and wheel textures in CARS\TEXTURES.BIN)
-	// VehicleRenderConn::Load
-	injector::MakeNOP(0x75D29E, 2, true); // Skip precomposite skins
-	injector::MakeRangedNOP(0x75D2BB, 0x75D2D6, true);
-	injector::WriteMemory<unsigned char>(0x75D2B6, 20, true); // 4 -> 20
-	// RideInfo::SetCompositeNameHash
-	injector::MakeRangedNOP(0x747F2B, 0x747F3B, true); // Skip precomposite skins
-	injector::MakeJMP(0x747F2B, 0x747F3B, true);
-	injector::WriteMemory<unsigned char>(0x747F22, 20, true); // 4 -> 20
+	if (!UnlimiterCompatibility && !LimitAdjusterCompatibility)
+	{
+		// Car Skin Fix (Requires CarSkinCount (20) x dummy skin and wheel textures in CARS\TEXTURES.BIN)
+		// VehicleRenderConn::Load
+		injector::MakeNOP(0x75D29E, 2, true); // Skip precomposite skins
+		injector::MakeRangedNOP(0x75D2BB, 0x75D2D6, true);
+		injector::WriteMemory<unsigned char>(0x75D2B6, 20, true); // 4 -> 20
+		// RideInfo::SetCompositeNameHash
+		injector::MakeRangedNOP(0x747F2B, 0x747F3B, true); // Skip precomposite skins
+		injector::MakeJMP(0x747F2B, 0x747F3B, true);
+		injector::WriteMemory<unsigned char>(0x747F22, 20, true); // 4 -> 20
+	}
 	
 	// Always add both ride height values, not just when it's close enough (from chassis and ecar) (ty rx)
 	injector::MakeRangedNOP(0x7470AC, 0x7470B2, true); // CarRenderConn::UpdateRenderMatrix
